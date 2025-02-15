@@ -11,6 +11,7 @@ load_dotenv(".env")
 TOKEN: str = os.getenv("TOKEN")
 bot = commands.Bot(command_prefix="!", intents=discord.Intents.all())
 bot_statuses = "a great adventure!"
+logging.basicConfig(level=logging.DEBUG)
 
 async def load():
     for filename in os.listdir("./cogs"):

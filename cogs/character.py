@@ -32,6 +32,7 @@ class Character(commands.Cog):
         if result:
             await interaction.followup.send("You already have a character! Would you like to create a new one or continue with your current character?", ephemeral=True)
         else:
+            await interaction.delete_original_response()
             await self.create_character(interaction)
                 
         connection.close()
@@ -129,4 +130,5 @@ class Character(commands.Cog):
 
 
 async def setup(bot):
+    print("Loading Character Cog...")
     await bot.add_cog(Character(bot))
