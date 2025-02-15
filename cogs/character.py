@@ -5,6 +5,7 @@ import sqlite3
 import math
 import random
 import asyncio
+import time
 
 class Character(commands.Cog):
     def __init__(self, bot):
@@ -13,6 +14,7 @@ class Character(commands.Cog):
         self.intelligence = "normal"
         self.luck = "normal"
         self.name = ""
+        self.creating_character = {}
 
     @commands.Cog.listener()
     async def on_ready(self):
@@ -21,8 +23,18 @@ class Character(commands.Cog):
     @app_commands.command(name="create", description="Create a new character")
     async def create(self, interaction: discord.Interaction):
         await interaction.response.defer(thinking=True)
-
         user_id = interaction.user.id
+
+        if user_id in self.creating_character:
+            time_left = 30 - (time.time() - self.creating_character[user_id])
+            if time_left > 0:
+                await interaction.followup.send(f"You're already creating a character. Please wait {int(time_left)} second(s).")
+                return
+            if time_left == 0:
+                del self.creating_character[user_id]
+        
+        self.creating_character[user_id] = time.time()        
+
         connection = sqlite3.connect("character.db")
         cursor = connection.cursor()
 
@@ -30,7 +42,7 @@ class Character(commands.Cog):
         result = cursor.fetchone()
         
         if result:
-            await interaction.followup.send("You already have a character! Would you like to create a new one or continue with your current character?", ephemeral=True)
+            await interaction.followup.send("You already have a character! Please /delete your character or /start your adventure!", ephemeral=True)
         else:
             await interaction.delete_original_response()
             await self.create_character(interaction)
@@ -38,6 +50,7 @@ class Character(commands.Cog):
         connection.close()
     
     async def create_character(self, interaction: discord.Interaction):
+        user_id = interaction.user.id
         try:
             dm_channel = await interaction.user.create_dm()
             await dm_channel.send("Please choose a name for your character.")
@@ -86,7 +99,9 @@ class Character(commands.Cog):
             connection.commit()
             connection.close()
 
-            await dm_channel.send(f"Character created!\n**Name**: {character_name.capitalize()}\n**Physique**: {physique.capitalize()}\n**Intelligence:** {intelligence.capitalize()}\n**Luck:** {luck.capitalize()}")
+        
+            await dm_channel.send(f"Character created!\n**Name**: {character_name.capitalize()}\n**Physique**: {physique.capitalize()}\n**Intelligence:** {intelligence.capitalize()}\n**Luck:** {luck.capitalize()}\nIf you would like to change anything please /delete your character and /create it again")
+            
 
         except discord.Forbidden:
             await interaction.followup.send("Please enable DMs for this server")
@@ -94,6 +109,8 @@ class Character(commands.Cog):
             await dm_channel.send("You took too long to respond. Please try again.")
         except Exception as e:
             await dm_channel.send(f"An unexpected error occurred: {e}")
+        finally:
+            del self.creating_character[user_id]
 
     @app_commands.command(name="delete", description="Delete your character")
     async def delete_character(self, interaction: discord.Interaction):
