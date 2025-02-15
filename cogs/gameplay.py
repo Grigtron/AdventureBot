@@ -39,8 +39,11 @@ class Gameplay(commands.Cog):
                 await interaction.followup.send("Your adventure begins now!")
 
             else:
+                story_connection = sqlite3.connect("storynodes.db")
+                story_cursor = story_connection.cursor()
+
                 story_key = progress[1]
-                cursor.execute("SELECT * FROM StoryNodes WHERE key = ?", (story_key,))
+                story_cursor.execute("SELECT * FROM StoryNodes WHERE key = ?", (story_key,))
                 story_node = cursor.fetchone()
 
                 if story_node:
@@ -50,7 +53,6 @@ class Gameplay(commands.Cog):
 
         finally:
             connection.close()
-            await interaction.delete_original_response()
 
 
 
