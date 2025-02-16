@@ -43,12 +43,22 @@ class Gameplay(commands.Cog):
                 story_cursor = story_connection.cursor()
 
                 story_key = progress[1]
-                story_cursor.execute("SELECT * FROM StoryNodes WHERE key = ?", (story_key,))
-                story_node = cursor.fetchone()
+                print(f"User's story_key: {story_key}")
+                story_cursor.execute("SELECT * FROM StoryNodes WHERE key = ?", (str(story_key),))
+                story_node = story_cursor.fetchone()
 
                 if story_node:
-                    await interaction.followup.send("Loading story progress...")
+                    print(f"Loaded story node: {story_node}")
+                    story_text = story_node[1]
+                    choices_json = story_node[2]
+                    choices = json.loads(choices_json)
+
+                    response_message = (f"{story_text}\n\nChoices:\n")
+                    for choice_key, choice_text in choices.items():
+                        response_message += f"{choice_key}: {choice_text}\n"
+                    await interaction.followup.send(response_message)
                 else:
+                    print (f"No story node found for story_key: {story_key}")
                     await interaction.followup.send("There was an issue loading your story progress.")
 
         finally:
