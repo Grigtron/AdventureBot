@@ -107,7 +107,8 @@ class Gameplay(commands.Cog):
         if choice_key not in choices:
             await interaction.followup.send(f"Invalid choice. Please /choose a valid choice.")
 
-        next_story_key = choice_key
+        next_story_key = choices[choice_key]["next"]
+
         print(f"Next story key for choice {choice_key}: {next_story_key}")
 
         connection = sqlite3.connect("character.db")
