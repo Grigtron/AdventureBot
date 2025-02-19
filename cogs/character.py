@@ -43,6 +43,8 @@ class Character(commands.Cog):
         
         if result:
             await interaction.followup.send("You already have a character! Please /delete your character or /start your adventure!", ephemeral=True)
+            if user_id in self.creating_character:
+                del self.creating_character[user_id]
         else:
             await interaction.delete_original_response()
             await self.create_character(interaction)
@@ -136,6 +138,7 @@ class Character(commands.Cog):
 
             if msg.content.lower() == "yes":
                 cursor.execute("DELETE FROM Character WHERE user_ID = ?", (user_id,))
+                cursor.execute("DELETE FROM PlayerProgress WHERE user_id = ?", (user_id,))
                 connection.commit()
                 await interaction.followup.send("Your character has been deleted.")
             else:
