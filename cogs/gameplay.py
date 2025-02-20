@@ -132,6 +132,35 @@ class Gameplay(commands.Cog):
         formatted_choices = "\n".join([f"{key}: {text}" for key, text in new_choices.items()])
         await interaction.followup.send(f"{new_story_text}\n\n**Choices:**\n{formatted_choices}")
 
+    @app_commands.command(name="reset", description="Reset your character's story progress.")
+    async def reset(self, interaction: discord.Interaction):
+        await interaction.response.defer(thinking=True)
+        user_id = interaction.user.id
+        try:
+            connection = sqlite3.connect("character.db")
+            cursor = connection.cursor()
+            cursor.execute("SELECT story_key FROM PlayerProgress WHERE user_id = ?", (user_id,))
+            result = cursor.fetchone()
+
+            if not result:
+                await interaction.followup.send("Your character has no story progression. Please use the /start command to begin!")
+                return
+            
+            
+            cursor.execute("UPDATE PlayerProgress SET story_key = 1 WHERE user_id = ?", (user_id,))
+            connection.commit()
+            print (f"Updating story for {user_id} to story key {self.get_player_progress(user_id)}")
+
+            await interaction.followup.send(f"Your story progress has been reset to the beginning!")
+
+        except sqlite3.Error as e:
+            await interaction.followup.send(f"An error occurred resetting your story progress. Please /delete your character and /create it again.")
+            print(f"SQLite error: {e}")
+
+        finally:
+            connection.close()
+
+
 
 
 
