@@ -30,4 +30,4 @@ Choices:
 Things to work on:
 Adding choices based on attributes
 A summary image generator of your character's story
-
+Possibly a way for people to insert their own stories
