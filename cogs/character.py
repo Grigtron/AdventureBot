@@ -102,7 +102,7 @@ class Character(commands.Cog):
             connection.close()
 
         
-            await dm_channel.send(f"Character created!\n**Name**: {character_name.capitalize()}\n**Physique**: {physique.capitalize()}\n**Intelligence:** {intelligence.capitalize()}\n**Luck:** {luck.capitalize()}\nIf you would like to change anything please /delete your character and /create it again")
+            await dm_channel.send(f"Character created!\n**Name**: {character_name.capitalize()}\n**Physique**: {physique.capitalize()}\n**Intelligence:** {intelligence.capitalize()}\n**Luck:** {luck.capitalize()}\nIf you would like to change anything please /delete your character and /create it again. To start the game please use /start")
             
 
         except discord.Forbidden:
