@@ -72,9 +72,9 @@ class Gameplay(commands.Cog):
                     choices_json = story_node[2]
                     choices = json.loads(choices_json)
 
-                    response_message = (f"{story_text}\n\nChoices:\n")
-                    for choice_key, choice_text in choices.items():
-                        response_message += f"{choice_key}: {choice_text}\n"
+                    response_message = f"{story_text}\n\n**Choices:**\n"
+                    for choice_key, choice_data in choices.items():
+                        response_message += f"{choice_key}: {choice_data['text']}\n"
                     await interaction.followup.send(response_message)
                 else:
                     print (f"No story node found for story_key: {story_key}")
@@ -129,7 +129,7 @@ class Gameplay(commands.Cog):
         new_story_text, new_choices_json = new_story_node
         new_choices = json.loads(new_choices_json)
 
-        formatted_choices = "\n".join([f"{key}: {text}" for key, text in new_choices.items()])
+        formatted_choices = "\n".join([f"{key}: {choice_data['text']}" for key, choice_data in new_choices.items()])
         await interaction.followup.send(f"{new_story_text}\n\n**Choices:**\n{formatted_choices}")
 
     @app_commands.command(name="reset", description="Reset your character's story progress.")
